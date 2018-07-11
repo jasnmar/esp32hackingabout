@@ -8,7 +8,7 @@ def index():
     #cookie = bottle.request.get_cookie("session")
 
 
-    return "text"
+    return "Hello World!!!\nI can write 2 lines!!!"
 
 
 bottle.debug(True)
