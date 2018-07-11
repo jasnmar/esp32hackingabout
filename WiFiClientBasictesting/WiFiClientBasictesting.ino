@@ -4,6 +4,7 @@
  */
 
 #include <WiFi.h>
+#include <String>
 
 const char* ssid     = "Meltwater Wireless";
 const char* password = "MoroEnereResp";
@@ -16,7 +17,7 @@ char newline = '\n';
 WiFiClient client;
 
 const uint16_t port = 8080;
-const char * host = "10.4.8.56"; // ip or dns
+const char * host = "10.4.8.174"; // ip or dns
 
 
 void setup()
@@ -87,6 +88,32 @@ void WiFiEvent(WiFiEvent_t event)
         break;
     }
 }
+
+void parseResponse(String response) {
+  //Serial.print("Data from client is: ");
+  //Serial.print(response);
+  //Serial.println();
+  char str[response.length()];
+  //const char nl = char('\r');
+  response.toCharArray(str,response.length());
+  Serial.print("Size of String is: ");
+  int strLength = sizeof(str);
+  Serial.println(strLength);
+  //Serial.print("A few characters: ");
+  //Serial.print(str[0]);
+  //Serial.print(str[1]);
+  //Serial.print(str[2]);
+  for (int i=0; i<strLength; i++){
+    Serial.print(str[i]);
+    //if(str[i]==char('\r')){
+      //Serial.println();
+    //Serial.println("This would print a thing");
+    //Serial.print(str);
+    //}
+  }
+
+  
+}
 void loop()
 {
 
@@ -104,31 +131,26 @@ void loop()
 
     
     //read back one line from server
+    Serial.println("Attempting Connection");
     while(client.connected()) {
-        Serial.println("Client Connected");
-
-
-        Serial.println("Performing GET");
+        //Serial.println("Client Connected");
+        //Serial.println("Performing GET");
         
         client.println("GET / HTTP/1.0");
         client.println();
-        while (client.peek()!= '\r') {
-          String line = client.readStringUntil(newline);
-          Serial.print("Data from client is: ");
-          Serial.print(line);
-          Serial.println();
-          
-        }
-
+        
+        String line = client.readString();
+        parseResponse(line);
   
 
     }
     
-
-    //Serial.println("closing connection");
+    Serial.println();
+    Serial.println("closing connection");
     //client.stop();
 
     //Serial.println("wait 5 sec...");
-    //delay(5000);
+    //Slowing stuff down for debugging purposes...
+    delay(5000);
 }
 

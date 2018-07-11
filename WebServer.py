@@ -5,8 +5,8 @@ import bottle
 @bottle.route('/')
 def index():
 
-    #cookie = bottle.request.get_cookie("session")
-
+    cookie = bottle.request.get_cookie("session")
+    #response.set_header()
 
     return "Hello World!!!\nI can write 2 lines!!!"
 
