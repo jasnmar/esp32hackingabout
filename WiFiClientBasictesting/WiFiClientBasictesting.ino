@@ -17,7 +17,7 @@ char newline = '\n';
 WiFiClient client;
 
 const uint16_t port = 8080;
-const char * host = "10.4.8.174"; // ip or dns
+const char * host = "10.4.8.87"; // ip or dns
 
 
 void setup()
@@ -103,13 +103,19 @@ void parseResponse(String response) {
   //Serial.print(str[0]);
   //Serial.print(str[1]);
   //Serial.print(str[2]);
+  int lineCount = 0;
+  String myText;
   for (int i=0; i<strLength; i++){
     Serial.print(str[i]);
-    //if(str[i]==char('\r')){
-      //Serial.println();
-    //Serial.println("This would print a thing");
-    //Serial.print(str);
-    //}
+    if(str[i]==char('\n')){
+      Serial.println("Hard Return");
+      lineCount++;
+    }
+    if (lineCount=5){
+       myText = myText + str[i]; 
+       Serial.println("I have some text for you!!!!!!!!");
+       Serial.println(myText);
+    }
   }
 
   
@@ -140,6 +146,8 @@ void loop()
         client.println();
         
         String line = client.readString();
+        //Serial.println("The string, it says:");
+        //Serial.println(line);
         parseResponse(line);
   
 
