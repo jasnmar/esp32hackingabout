@@ -5,7 +5,7 @@ import bottle
 @bottle.route('/')
 def index():
 
-    #cookie = bottle.request.get_cookie("session")
+    bottle.response.set_cookie("temperature", "True")
     #response.set_header()
 
     return "Hello World!!!\nI can write 2 lines!!!"
