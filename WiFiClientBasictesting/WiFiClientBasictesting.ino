@@ -106,18 +106,22 @@ void parseResponse(String response) {
   int lineCount = 0;
   String myText;
   for (int i=0; i<strLength; i++){
-    Serial.print(str[i]);
+    //Serial.print(str[i]);
     if(str[i]==char('\n')){
-      Serial.println("Hard Return");
+      //Serial.println("Hard Return");
       lineCount++;
+      //Serial.print("LineCount is: ");
+      //Serial.println(lineCount);
     }
-    if (lineCount=5){
+    if (lineCount==7){
        myText = myText + str[i]; 
-       Serial.println("I have some text for you!!!!!!!!");
-       Serial.println(myText);
-    }
-  }
 
+    }
+
+  }
+       Serial.println("Data recieved from Server:");
+       Serial.println(myText);
+       Serial.println("That was my text!!!!!!");
   
 }
 void loop()
