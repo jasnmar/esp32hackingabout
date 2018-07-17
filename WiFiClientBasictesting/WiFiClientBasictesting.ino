@@ -5,59 +5,75 @@
 
 #include <WiFi.h>
 #include <String>
+#include "SSD1306.h" // alias for `#include "SSD1306Wire.h"`
 
+//Wifi Settings
 const char* ssid     = "Meltwater Wireless";
 const char* password = "MoroEnereResp";
-char newline = '\n';
 
-
-//#include <WiFiMulti.h>
-
-//WiFiMulti WiFiMulti;
 WiFiClient client;
 
+//Server Settings
 const uint16_t port = 8080;
 const char * host = "10.4.8.87"; // ip or dns
 
+String displayString;
+
+
+//Display Settings
+SSD1306  display(0x3c, 4, 15);
 
 void setup()
 {
-    Serial.begin(115200);
-    delay(10);
+  //Initialize the serial port (for debugging)
+  Serial.begin(115200);
+  delay(10);
 
 
-    // Kill any existing wifi connection
-    Serial.println();
-    Serial.println();
-    Serial.println("Disconnecting Wifi");
-    WiFi.disconnect(true);
-    delay(1000);
-    
-    
-    // We start by connecting to a WiFi network
-    
-    WiFi.begin(ssid, password);
-    Serial.println();
-    Serial.println();
-    Serial.print("Wait for WiFi... ");
+  // Kill any existing wifi connection
+  Serial.println("Disconnecting Wifi");
+  WiFi.disconnect(true);
+  delay(1000);
+  
+  
+  // We start by connecting to a WiFi network
+  WiFi.begin(ssid, password);
+  Serial.println();
+  Serial.println();
+  Serial.print("Wait for WiFi... ");
+
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  delay(500);
+  Serial.print("connecting to ");
+  Serial.println(host);
+
+  bool wifiConnected = false;
+
+  while(!!wifiConnected){
+    wifiConnected = WiFiConnect();
+  }
+  
+
+  
+  //Display settings
+
+  screenSetup();
 
 
-
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-
-    delay(500);
-    Serial.print("connecting to ");
-    Serial.println(host);
-
-    // Use WiFiClient class to create TCP connections
-
-    WiFiConnect();
 
 }
 
+void drawFontFaceDemo() {
+    // Font Demo1
+    // create more fonts at http://oleddisplay.squix.ch/
+
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setFont(ArialMT_Plain_16);
+    display.drawString(0, 0, displayString);
+}
 
 bool WiFiConnect(){
       if (!client.connect(host, port)) {
@@ -88,6 +104,23 @@ void WiFiEvent(WiFiEvent_t event)
         break;
     }
 }
+void screenSetup() {
+  Serial.println("Setting up the Screen");
+
+
+  pinMode(16,OUTPUT);
+  digitalWrite(16, LOW);    // set GPIO16 low to reset OLED
+  delay(50); 
+  digitalWrite(16, HIGH); // while OLED is running, must set GPIO16 in high
+
+ 
+  display.init();
+
+  display.flipScreenVertically();
+  display.setFont(ArialMT_Plain_10);
+
+}
+
 
 void parseResponse(String response) {
   //Serial.print("Data from client is: ");
@@ -119,9 +152,10 @@ void parseResponse(String response) {
     }
 
   }
-       Serial.println("Data recieved from Server:");
+       //Serial.println("Data recieved from Server:");
        Serial.println(myText);
-       Serial.println("That was my text!!!!!!");
+       //Serial.println("That was my text!!!!!!");
+       displayString = myText;
   
 }
 void loop()
@@ -131,17 +165,19 @@ void loop()
     WiFiConnect();
   }
 
-
- 
-
-    // This will send the request to the server
-    //client.print("GET / HTTP/1.1");
-
+    //Set the Wificlient timeout
     client.setTimeout(1000);
+
+
+    
+    display.clear();
+    drawFontFaceDemo();
+    display.display();
 
     
     //read back one line from server
     Serial.println("Attempting Connection");
+    
     while(client.connected()) {
         //Serial.println("Client Connected");
         //Serial.println("Performing GET");
@@ -159,6 +195,7 @@ void loop()
     
     Serial.println();
     Serial.println("closing connection");
+    Serial.println();
     //client.stop();
 
     //Serial.println("wait 5 sec...");
