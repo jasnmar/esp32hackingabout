@@ -17,7 +17,7 @@ WiFiClient client;
 const uint16_t port = 8080;
 const char * host = "10.4.8.87"; // ip or dns
 
-String displayString;
+//String displayString;
 
 
 //Display Settings
@@ -62,11 +62,13 @@ void setup()
 
   screenSetup();
 
-
+    display.clear();
+    setScreenText("Initializing...");
+    display.display();
 
 }
-
-void drawFontFaceDemo() {
+/*
+void getScreenText() {
     // Font Demo1
     // create more fonts at http://oleddisplay.squix.ch/
 
@@ -74,14 +76,28 @@ void drawFontFaceDemo() {
     display.setFont(ArialMT_Plain_16);
     display.drawString(0, 0, displayString);
 }
+*/
+void setScreenText(String textToDisplay) {
+    // Font Demo1
+    // create more fonts at http://oleddisplay.squix.ch/
+
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setFont(ArialMT_Plain_16);
+    display.drawString(0, 0, textToDisplay);
+}
 
 bool WiFiConnect(){
       if (!client.connect(host, port)) {
         
         Serial.println("connection failed");
         Serial.println("wait 5 sec...");
+        display.clear();
+        setScreenText("Error Connecting to Server");
+        
+        display.display();
         delay(5000);
         if(!client.connected()) {
+          
           return false;
         } else {
           return true;
@@ -107,13 +123,11 @@ void WiFiEvent(WiFiEvent_t event)
 void screenSetup() {
   Serial.println("Setting up the Screen");
 
-
   pinMode(16,OUTPUT);
   digitalWrite(16, LOW);    // set GPIO16 low to reset OLED
   delay(50); 
   digitalWrite(16, HIGH); // while OLED is running, must set GPIO16 in high
 
- 
   display.init();
 
   display.flipScreenVertically();
@@ -122,20 +136,13 @@ void screenSetup() {
 }
 
 
-void parseResponse(String response) {
-  //Serial.print("Data from client is: ");
-  //Serial.print(response);
-  //Serial.println();
+String parseResponse(String response) {
   char str[response.length()];
   //const char nl = char('\r');
   response.toCharArray(str,response.length());
   Serial.print("Size of String is: ");
   int strLength = sizeof(str);
   Serial.println(strLength);
-  //Serial.print("A few characters: ");
-  //Serial.print(str[0]);
-  //Serial.print(str[1]);
-  //Serial.print(str[2]);
   int lineCount = 0;
   String myText;
   for (int i=0; i<strLength; i++){
@@ -143,8 +150,6 @@ void parseResponse(String response) {
     if(str[i]==char('\n')){
       //Serial.println("Hard Return");
       lineCount++;
-      //Serial.print("LineCount is: ");
-      //Serial.println(lineCount);
     }
     if (lineCount==7){
        myText = myText + str[i]; 
@@ -155,11 +160,12 @@ void parseResponse(String response) {
        //Serial.println("Data recieved from Server:");
        Serial.println(myText);
        //Serial.println("That was my text!!!!!!");
-       displayString = myText;
+       return myText;
   
 }
 void loop()
 {
+  String displayString;
 
   if(!client.connected()) {
     WiFiConnect();
@@ -167,30 +173,23 @@ void loop()
 
     //Set the Wificlient timeout
     client.setTimeout(1000);
-
-
     
-    display.clear();
-    drawFontFaceDemo();
-    display.display();
-
-    
-    //read back one line from server
     Serial.println("Attempting Connection");
     
     while(client.connected()) {
-        //Serial.println("Client Connected");
-        //Serial.println("Performing GET");
-        
+
         client.println("GET / HTTP/1.0");
         client.println();
         
         String line = client.readString();
-        //Serial.println("The string, it says:");
-        //Serial.println(line);
-        parseResponse(line);
+        displayString = parseResponse(line);
   
 
+    }
+    if (displayString) {
+      display.clear();
+      setScreenText(displayString);
+      display.display();
     }
     
     Serial.println();
