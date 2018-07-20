@@ -8,7 +8,7 @@ def index():
     bottle.response.set_cookie("temperature", "True")
     #response.set_header()
 
-    return "Carlito's Way "
+    return "I'm on a boat "
 
 
 bottle.debug(True)

@@ -17,42 +17,6 @@ WiFiClient client;
 #include "SSD1306.h"
 SSD1306  display(0x3c, 4, 15);
 
-void setup()
-{
-  //Initialize the serial port (for debugging)
-  Serial.begin(115200);
-  delay(10);
-
-  // Kill any existing wifi connection
-  Serial.println("Disconnecting Wifi");
-  WiFi.disconnect(true);
-  screenSetup();
-  // Clear the screen
-  display.clear();
-  //post a start up message
-  setScreenText("Initializing...");
-  display.display();
-  
-  //give stuff some time to init
-  delay(1000);
-  
-  
-  // We start by connecting to a WiFi network
-  WiFi.begin(ssid, password);
-  Serial.println();
-  Serial.println();
-  Serial.print("Wait for WiFi... ");
-
-  //delay(500);
-  Serial.print("connecting to ");
-  Serial.println(host);
-
-  bool wifiConnected = false;
-
-  while(!!wifiConnected){
-    wifiConnected = WiFiConnect();
-  }
-}
 
 
 //This is just going to set the top line of the display at this time
@@ -65,18 +29,20 @@ void setScreenText(String textToDisplay) {
     display.drawString(0, 0, textToDisplay);
 }
 
-bool WiFiConnect(){
-  if (!client.connect(host, port)) {
-        
+void WiFiConnectionError(){
     Serial.println("connection failed");
     Serial.println("wait 5 sec...");
     display.clear();
     setScreenText("Error Connecting to Server");
     display.display();
     delay(5000);
-    
+}
+
+bool WiFiConnect(){
+  if (!client.connect(host, port)) {
   }
   if(!client.connected()) {
+    WiFiConnectionError();
     return false;
   } else {
     return true;
@@ -140,6 +106,47 @@ String parseResponse(String response) {
        return myText;
   
 }
+
+void setup()
+{
+  //Initialize the serial port (for debugging)
+  Serial.begin(115200);
+  delay(10);
+
+  // Kill any existing wifi connection
+  Serial.println("Disconnecting Wifi");
+  WiFi.disconnect(true);
+  screenSetup();
+  // Clear the screen
+  display.clear();
+  //post a start up message
+  setScreenText("Initializing...");
+  display.display();
+  
+  //give stuff some time to init
+  delay(1000);
+  
+  
+  // We start by connecting to a WiFi network
+  WiFi.begin(ssid, password);
+  Serial.println();
+  Serial.println();
+  Serial.print("Wait for WiFi... ");
+
+  //delay(500);
+  Serial.print("connecting to ");
+  Serial.println(host);
+
+  bool wifiConnected = false;
+
+  while(!!wifiConnected){
+    wifiConnected = WiFiConnect();
+    if(!wifiConnected) {
+      WiFiConnectionError();
+    }
+  }
+}
+
 void loop()
 {
   String displayString;
