@@ -19,6 +19,7 @@ SSD1306  display(0x3c, 4, 15);
 
 
 //This is just going to set the top line of the display at this time
+//It would be nice to be able to have the text scroll if / when it updates.
 void setScreenText(String textToDisplay) {
     // create more fonts at http://oleddisplay.squix.ch/
 
