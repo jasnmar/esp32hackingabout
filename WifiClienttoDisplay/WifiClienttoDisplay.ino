@@ -26,7 +26,9 @@ void setScreenText(String textToDisplay) {
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.setFont(ArialMT_Plain_16);
-    display.drawString(0, 0, textToDisplay);
+//    display.drawString(0, 0, textToDisplay);
+    uint16_t maxStringWidth = getStringWidth(textToDisplay)
+    display.drawStringMaxWidth(0, 0, maxStringWidth, textToDisplay);
 }
 
 void WiFiConnectionError(){
