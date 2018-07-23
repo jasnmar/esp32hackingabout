@@ -2,7 +2,6 @@
 
 
 #include <WiFi.h>
-//#include <String>
 
 //Wifi Settings
 const char* ssid     = "Meltwater Wireless";
