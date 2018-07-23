@@ -20,7 +20,6 @@ SSD1306  display(0x3c, 4, 15);
 
 //This is just going to set the top line of the display at this time
 void setScreenText(String textToDisplay) {
-    // Font Demo1
     // create more fonts at http://oleddisplay.squix.ch/
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
